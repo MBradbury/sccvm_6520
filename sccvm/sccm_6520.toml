@@ -12,7 +12,7 @@
 
 # ---- Module ----------------------------------------------------------------
 [module]
-description = "SCCM_6520 - Example Module Title"
+description = "SCCM_6520 - Secure Cyber Physical Systems"
 disclaimer = "These VMs should only be used as directed by your instructor."
 
 # Quick actions shown at the top of the module tab (optional, remove if not needed).
@@ -23,60 +23,22 @@ disclaimer = "These VMs should only be used as directed by your instructor."
 [[module.actions]]
 name = "Launch Lab VMs"
 description = "Start all lab VMs"
-vm_names = ["sccm_6520_example_linux", "sccm_6520_example_kali"]
+vm_names = ["sccm_6520_asherah"]
 mode = "vm"
 
 [[module.actions]]
 name = "Open Lab SPICE"
 description = "Open the SPICE console for the Kali VM"
-vm_names = ["sccm_6520_example_kali"]
+vm_names = ["sccm_6520_asherah"]
 mode = "spice"
 
-# A "Launch all" entry under a category heading (optional).
-# The quoted name must exactly match a category used by VMs below.
-[module.section_actions."Main Lab"]
-enabled = true
-mode = "vm_with_kali_spice"
-description = "Launch all Main Lab VMs (SPICE viewer for Kali only)"
-
 # ---- VMs -------------------------------------------------------------------
-[vms.sccm_6520_example_linux]
-name = "sccm_6520_example_linux"
-display_name = "Example Linux"
-script = "$HOME/.sccm_6520/bin/sccm_6520_launch_example_linux"
-spice_script = "$HOME/.sccm_6520/bin/sccm_6520_spice_example_linux"
-description = "Linux target system"
+[vms.sccm_6520_asherah]
+name = "sccm_6520_asherah"
+display_name = "Asherah"
+script = "$HOME/.sccm_6520/bin/sccm_6520_launch_asherah"
+spice_script = "$HOME/.sccm_6520/bin/sccm_6520_spice_asherah"
+description = "The Asherah NPP Simulator"
 category = "Main Lab"
 module = "SCCM_6520"
-tags = ["sccm_6520", "linux", "main-lab"]
-
-[vms.sccm_6520_example_kali]
-name = "sccm_6520_example_kali"
-display_name = "Example Kali"
-script = "$HOME/.sccm_6520/bin/sccm_6520_launch_example_kali"
-spice_script = "$HOME/.sccm_6520/bin/sccm_6520_spice_example_kali"
-description = "Kali Linux attack box"
-category = "Main Lab"
-module = "SCCM_6520"
-tags = ["sccm_6520", "kali", "main-lab"]
-
-# ---- Time-restricted VMs (assessments) - optional --------------------------
-# A VM with access_control is only launchable between start and end.
-# Times are RFC3339 with timezone: YYYY-MM-DDTHH:MM:SS+00:00 (use +01:00 in BST,
-# from the last Sunday in March to the last Sunday in October).
-# Multiple windows are allowed: add another [vms.X.access_control.<period>] block.
-#
-# [vms.sccm_6520_assessment]
-# name = "sccm_6520_assessment"
-# display_name = "Week 15 - Assessment"
-# script = "$HOME/.sccm_6520/bin/sccm_6520_launch_assessment"
-# spice_script = "$HOME/.sccm_6520/bin/sccm_6520_spice_assessment"
-# description = "Assessment environment"
-# category = "Week 15 Assessment"
-# module = "SCCM_6520"
-# tags = ["sccm_6520", "assessment"]
-#
-# [vms.sccm_6520_assessment.access_control.wk15]
-# start = "2026-02-16T09:00:00+00:00"
-# end = "2026-02-16T17:00:00+00:00"
-# description = "Week 15 Assessment"
+tags = ["sccm_6520", "asherah", "main-lab"]

@@ -5,8 +5,8 @@
 # FILL IN block. SPICE_PORT must match SPICE_PORT in the VM's launch script.
 
 # ---- FILL IN ---------------------------------------------------------------
-VM_DISPLAY_NAME="Example Kali"
-SPICE_PORT=8002                         # same as bin/sccm_6520_launch_example_kali
+VM_DISPLAY_NAME="Asherah"
+SPICE_PORT=8001                         # same as bin/sccm_6520_launch_example_linux
 # ----------------------------------------------------------------------------
 
 MAX_WAIT=60

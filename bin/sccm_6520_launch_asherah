@@ -12,8 +12,8 @@
 #   LAB_DIR="$PWD" NET_MODE=user bin/sccm_6520_launch_example_linux
 
 # ---- FILL IN ---------------------------------------------------------------
-VM_DISPLAY_NAME="Example Linux"         # shown in the terminal banner
-IMAGE="sccm_6520_example_linux.qcow2"   # filename in images/, unique in this project
+VM_DISPLAY_NAME="Asherah"               # shown in the terminal banner
+IMAGE="sccm_6520_asherah.qcow2"         # filename in images/, unique in this project
 CPUS=2
 MEMORY="2048M"
 MAC="52:54:00:00:00:01"                 # unique per VM
