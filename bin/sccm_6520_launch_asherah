@@ -14,12 +14,18 @@
 # ---- FILL IN ---------------------------------------------------------------
 VM_DISPLAY_NAME="Asherah"               # shown in the terminal banner
 IMAGE="sccm_6520_asherah.qcow2"         # filename in images/, unique in this project
-CPUS=2
-MEMORY="2048M"
+CPUS=4
+MEMORY="8192M"
 MAC="52:54:00:00:00:01"                 # unique per VM
 QMP_PORT=9001                           # unique per VM: 9001, 9002, ...
 SPICE_PORT=8001                         # unique per VM: 8001, 8002, ...
 BRIDGE="br1"                            # lab bridge - leave as br1 unless Systems say otherwise
+# ---- Shared Folder Configuration -------------------------------------------
+HOST_VIRTIO_FS_SOCK="/tmp/virtiofs-share-asherah.sock"
+HOST_SHARED_DIRECTORY="$HOME/h-drive/sccm6520"
+VM_SHARE_NAME="share"
+VM_UID="1001"
+VM_GID="1001"
 # ----------------------------------------------------------------------------
 
 VM_NAME="${0##*_launch_}"              # from the filename, e.g. example_kali
@@ -43,6 +49,19 @@ if [ ! -f "$IMAGE_PATH" ]; then
 	exit 1
 fi
 
+if [ ! -d "$HOST_SHARED_DIRECTORY" ]; then
+	echo -e "${RED}[sccm_6520]${NC} Shared folder not found: $HOST_SHARED_DIRECTORY"
+	echo -e "${BLUE}[sccm_6520]${NC} Creating shared folder at $HOST_SHARED_DIRECTORY"
+	mkdir -p "$HOST_SHARED_DIRECTORY"
+fi
+
+if [ -f "$HOST_VIRTIO_FS_SOCK" ]; then
+	echo -e "${RED}[sccm_6520]${NC} You may already have Asherah running, if so, please stop it before trying to launch again."
+	echo -e "${RED}[sccm_6520]${NC} If Asherah is not running, then please remove $HOST_VIRTIO_FS_SOCK before trying again."
+	echo -e "${RED}[sccm_6520]${NC} ${PINK}$ rm $HOST_VIRTIO_FS_SOCK${NC}"
+	exit 1
+fi
+
 # NET_MODE=user gives NAT networking for testing on a machine without br1.
 if [ "${NET_MODE:-bridge}" = "user" ]; then
 	NETDEV="user,id=net0"
@@ -55,25 +74,36 @@ echo -e "${BLUE}[sccm_6520]${NC} VM may take a few minutes to start - please kee
 echo -e "${BLUE}[sccm_6520]${NC} ${PINK}Press Ctrl+C to quit.${NC}"
 echo ""
 
+/usr/lib/qemu/virtiofsd \
+	--socket-path "$HOST_VIRTIO_FS_SOCK" \
+	--shared-dir "$HOST_SHARED_DIRECTORY" \
+	--uid-map ":$VM_UID:$(id -u):1:" \
+	--gid-map ":$VM_GID:$(id -g):1:" &
+
 exec qemu-system-x86_64 \
 	-boot c \
 	-name "$VM_NAME" \
 	-smp "$CPUS" \
 	-m "$MEMORY" \
 	-cpu host,host-phys-bits=on \
-	-machine type=q35,accel=kvm,acpi=on,i8042=off \
+	-machine type=q35,acpi=on,i8042=off,accel=kvm \
 	-device virtio-scsi-pci,id=scsi0 \
 	-device scsi-hd,bus=scsi0.0,drive=drive0 \
 	-drive if=none,file="$IMAGE_PATH",id=drive0,cache=writeback,discard=unmap,format=qcow2 \
-	-vga none -device qxl-vga,max_outputs=1,vgamem_mb=16,vram_size_mb=128,ram_size_mb=128 \
+	-vga none -device qxl-vga,max_outputs=1,vgamem_mb=16,vram_size_mb=48,ram_size_mb=48 \
 	-display none \
 	-device virtio-net,netdev=net0,mac="$MAC" \
 	-netdev "$NETDEV" \
 	-device qemu-xhci \
 	-device usb-tablet \
 	-device usb-kbd \
+	-device virtio-rng-pci \
 	-qmp tcp:localhost:"$QMP_PORT",server=on,wait=off \
 	-spice port="$SPICE_PORT",addr=127.0.0.1,disable-ticketing=on,image-compression=off \
-	-device virtio-serial,id=virtio-serial0 \
 	-chardev spicevmc,id=vdagent,debug=0,name=vdagent \
-	-device virtserialport,bus=virtio-serial0.0,chardev=vdagent,name=com.redhat.spice.0
+	-device virtio-serial,id=virtio-serial0 \
+	-device virtserialport,bus=virtio-serial0.0,chardev=vdagent,name=com.redhat.spice.0 \
+	-chardev socket,id=sharedfoldershare,path="$HOST_VIRTIO_FS_SOCK" \
+	-device vhost-user-fs-pci,chardev=sharedfoldershare,tag="$VM_SHARE_NAME" \
+	-object memory-backend-memfd,id=mem,size="$MEMORY",share=on \
+	-numa node,memdev=mem
