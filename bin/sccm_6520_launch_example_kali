@@ -1,5 +1,5 @@
 #!/bin/bash
-# sccm_0000 - VM launch script (one per VM).
+# sccm_6520 - VM launch script (one per VM).
 #
 # The VM name is taken from this file's name: bin/<module>_launch_<vm>.
 # Use lower-case letters, digits and underscores for <vm>, e.g. example_kali.
@@ -9,11 +9,11 @@
 # Run tools/check.sh after editing.
 #
 # Local test (Linux + KVM only):
-#   LAB_DIR="$PWD" NET_MODE=user bin/sccm_0000_launch_example_kali
+#   LAB_DIR="$PWD" NET_MODE=user bin/sccm_6520_launch_example_kali
 
 # ---- FILL IN ---------------------------------------------------------------
 VM_DISPLAY_NAME="Example Kali"          # shown in the terminal banner
-IMAGE="sccm_0000_example_kali.qcow2"    # filename in images/, unique in this project
+IMAGE="sccm_6520_example_kali.qcow2"    # filename in images/, unique in this project
 CPUS=2
 MEMORY="4096M"
 MAC="52:54:00:00:00:02"                 # unique per VM
@@ -23,7 +23,7 @@ BRIDGE="br1"                            # lab bridge - leave as br1 unless Syste
 # ----------------------------------------------------------------------------
 
 VM_NAME="${0##*_launch_}"              # from the filename, e.g. example_kali
-LAB_DIR="${LAB_DIR:-$HOME/.sccm_0000}"
+LAB_DIR="${LAB_DIR:-$HOME/.sccm_6520}"
 IMAGE_PATH="$LAB_DIR/images/$IMAGE"
 
 # Colours
@@ -39,7 +39,7 @@ echo -e "${RED}╚════════════════════�
 echo ""
 
 if [ ! -f "$IMAGE_PATH" ]; then
-	echo -e "${RED}[sccm_0000]${NC} VM image not found: $IMAGE_PATH"
+	echo -e "${RED}[sccm_6520]${NC} VM image not found: $IMAGE_PATH"
 	exit 1
 fi
 
@@ -50,9 +50,9 @@ else
 	NETDEV="bridge,id=net0,br=$BRIDGE"
 fi
 
-echo -e "${BLUE}[sccm_0000]${NC} Launching ${VM_DISPLAY_NAME} VM..."
-echo -e "${BLUE}[sccm_0000]${NC} VM may take a few minutes to start - please keep this window open."
-echo -e "${BLUE}[sccm_0000]${NC} ${PINK}Press Ctrl+C to quit.${NC}"
+echo -e "${BLUE}[sccm_6520]${NC} Launching ${VM_DISPLAY_NAME} VM..."
+echo -e "${BLUE}[sccm_6520]${NC} VM may take a few minutes to start - please keep this window open."
+echo -e "${BLUE}[sccm_6520]${NC} ${PINK}Press Ctrl+C to quit.${NC}"
 echo ""
 
 exec qemu-system-x86_64 \

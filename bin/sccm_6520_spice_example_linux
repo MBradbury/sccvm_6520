@@ -1,12 +1,12 @@
 #!/bin/bash
-# sccm_0000 - SPICE console script (one per VM with a desktop).
+# sccm_6520 - SPICE console script (one per VM with a desktop).
 #
 # To add one: copy this file to bin/<module>_spice_<vm> and edit only the
 # FILL IN block. SPICE_PORT must match SPICE_PORT in the VM's launch script.
 
 # ---- FILL IN ---------------------------------------------------------------
 VM_DISPLAY_NAME="Example Linux"
-SPICE_PORT=8001                         # same as bin/sccm_0000_launch_example_linux
+SPICE_PORT=8001                         # same as bin/sccm_6520_launch_example_linux
 # ----------------------------------------------------------------------------
 
 MAX_WAIT=60
@@ -18,8 +18,8 @@ YELLOW="\033[1;33m"
 PINK="\033[1;35m"
 NC="\033[0m"
 
-echo -e "${BLUE}[sccm_0000 SPICE]${NC} Opening SPICE console for ${YELLOW}${VM_DISPLAY_NAME}${NC}..."
-echo -e "${BLUE}[sccm_0000 SPICE]${NC} Waiting up to ${YELLOW}${MAX_WAIT}${NC} seconds for port ${YELLOW}${SPICE_PORT}${NC}..."
+echo -e "${BLUE}[sccm_6520 SPICE]${NC} Opening SPICE console for ${YELLOW}${VM_DISPLAY_NAME}${NC}..."
+echo -e "${BLUE}[sccm_6520 SPICE]${NC} Waiting up to ${YELLOW}${MAX_WAIT}${NC} seconds for port ${YELLOW}${SPICE_PORT}${NC}..."
 echo ""
 
 WAIT_COUNT=0
@@ -27,14 +27,14 @@ while ! nc -z 127.0.0.1 "$SPICE_PORT" 2>/dev/null; do
 	sleep 1
 	WAIT_COUNT=$((WAIT_COUNT + 1))
 	if [ "$WAIT_COUNT" -ge "$MAX_WAIT" ]; then
-		echo -e "${RED}[sccm_0000 SPICE]${NC} Error: SPICE port ${SPICE_PORT} not available after ${MAX_WAIT} seconds"
-		echo -e "${YELLOW}[sccm_0000 SPICE]${NC} Make sure the VM is running"
+		echo -e "${RED}[sccm_6520 SPICE]${NC} Error: SPICE port ${SPICE_PORT} not available after ${MAX_WAIT} seconds"
+		echo -e "${YELLOW}[sccm_6520 SPICE]${NC} Make sure the VM is running"
 		exit 1
 	fi
 done
 
-echo -e "${BLUE}[sccm_0000 SPICE]${NC} VM is ready! Opening viewer..."
-echo -e "${BLUE}[sccm_0000 SPICE]${NC} ${PINK}Close the viewer window to disconnect${NC}"
+echo -e "${BLUE}[sccm_6520 SPICE]${NC} VM is ready! Opening viewer..."
+echo -e "${BLUE}[sccm_6520 SPICE]${NC} ${PINK}Close the viewer window to disconnect${NC}"
 echo ""
 
 exec remote-viewer "spice://127.0.0.1:${SPICE_PORT}"
