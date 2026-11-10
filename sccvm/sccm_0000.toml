@@ -1,0 +1,82 @@
+# sccm_0000 - sccvm module configuration
+#
+# This file becomes /etc/sccvm/conf.d/sccm_0000.toml on the lab machines.
+# - The filename is the module: sccm_0000.toml shows up as the "SCCM_0000" tab.
+# - Script paths point at $HOME/.sccm_0000/bin/, where each student's copy of
+#   this repo's bin/ folder will live. Keep that prefix, change only the script name.
+# - VM names come from the launch script filenames, which are the source of
+#   truth. bin/sccm_0000_launch_<vm> needs an entry [vms.sccm_0000_<vm>], with
+#   name set to the same value.
+# - This file is edited directly (not generated), as every lab is set up differently.
+#   Run tools/check.sh after editing to catch anything that doesn't match bin/.
+
+# ---- Module ----------------------------------------------------------------
+[module]
+description = "SCCM_0000 - Example Module Title"
+disclaimer = "These VMs should only be used as directed by your instructor."
+
+# Quick actions shown at the top of the module tab (optional, remove if not needed).
+# mode: "vm"     - start the VMs
+#       "spice"  - open SPICE consoles only
+#       "both"   - start the VMs and open a SPICE console for each
+#       "vm_with_kali_spice" - start all VMs, SPICE console only for VMs with "kali" in their name
+[[module.actions]]
+name = "Launch Lab VMs"
+description = "Start all lab VMs"
+vm_names = ["sccm_0000_example_linux", "sccm_0000_example_kali"]
+mode = "vm"
+
+[[module.actions]]
+name = "Open Lab SPICE"
+description = "Open the SPICE console for the Kali VM"
+vm_names = ["sccm_0000_example_kali"]
+mode = "spice"
+
+# A "Launch all" entry under a category heading (optional).
+# The quoted name must exactly match a category used by VMs below.
+[module.section_actions."Main Lab"]
+enabled = true
+mode = "vm_with_kali_spice"
+description = "Launch all Main Lab VMs (SPICE viewer for Kali only)"
+
+# ---- VMs -------------------------------------------------------------------
+[vms.sccm_0000_example_linux]
+name = "sccm_0000_example_linux"
+display_name = "Example Linux"
+script = "$HOME/.sccm_0000/bin/sccm_0000_launch_example_linux"
+spice_script = "$HOME/.sccm_0000/bin/sccm_0000_spice_example_linux"
+description = "Linux target system"
+category = "Main Lab"
+module = "SCCM_0000"
+tags = ["sccm_0000", "linux", "main-lab"]
+
+[vms.sccm_0000_example_kali]
+name = "sccm_0000_example_kali"
+display_name = "Example Kali"
+script = "$HOME/.sccm_0000/bin/sccm_0000_launch_example_kali"
+spice_script = "$HOME/.sccm_0000/bin/sccm_0000_spice_example_kali"
+description = "Kali Linux attack box"
+category = "Main Lab"
+module = "SCCM_0000"
+tags = ["sccm_0000", "kali", "main-lab"]
+
+# ---- Time-restricted VMs (assessments) - optional --------------------------
+# A VM with access_control is only launchable between start and end.
+# Times are RFC3339 with timezone: YYYY-MM-DDTHH:MM:SS+00:00 (use +01:00 in BST,
+# from the last Sunday in March to the last Sunday in October).
+# Multiple windows are allowed: add another [vms.X.access_control.<period>] block.
+#
+# [vms.sccm_0000_assessment]
+# name = "sccm_0000_assessment"
+# display_name = "Week 15 - Assessment"
+# script = "$HOME/.sccm_0000/bin/sccm_0000_launch_assessment"
+# spice_script = "$HOME/.sccm_0000/bin/sccm_0000_spice_assessment"
+# description = "Assessment environment"
+# category = "Week 15 Assessment"
+# module = "SCCM_0000"
+# tags = ["sccm_0000", "assessment"]
+#
+# [vms.sccm_0000_assessment.access_control.wk15]
+# start = "2026-02-16T09:00:00+00:00"
+# end = "2026-02-16T17:00:00+00:00"
+# description = "Week 15 Assessment"

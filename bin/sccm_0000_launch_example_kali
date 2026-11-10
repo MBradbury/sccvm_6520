@@ -1,0 +1,79 @@
+#!/bin/bash
+# sccm_0000 - VM launch script (one per VM).
+#
+# The VM name is taken from this file's name: bin/<module>_launch_<vm>.
+# Use lower-case letters, digits and underscores for <vm>, e.g. example_kali.
+#
+# To add a VM: copy this file to bin/<module>_launch_<vm>, then edit only the
+# FILL IN block. Every VM must have its own IMAGE, MAC, QMP_PORT and SPICE_PORT.
+# Run tools/check.sh after editing.
+#
+# Local test (Linux + KVM only):
+#   LAB_DIR="$PWD" NET_MODE=user bin/sccm_0000_launch_example_kali
+
+# ---- FILL IN ---------------------------------------------------------------
+VM_DISPLAY_NAME="Example Kali"          # shown in the terminal banner
+IMAGE="sccm_0000_example_kali.qcow2"    # filename in images/, unique in this project
+CPUS=2
+MEMORY="4096M"
+MAC="52:54:00:00:00:02"                 # unique per VM
+QMP_PORT=9002                           # unique per VM: 9001, 9002, ...
+SPICE_PORT=8002                         # unique per VM: 8001, 8002, ...
+BRIDGE="br1"                            # lab bridge - leave as br1 unless Systems say otherwise
+# ----------------------------------------------------------------------------
+
+VM_NAME="${0##*_launch_}"              # from the filename, e.g. example_kali
+LAB_DIR="${LAB_DIR:-$HOME/.sccm_0000}"
+IMAGE_PATH="$LAB_DIR/images/$IMAGE"
+
+# Colours
+RED="\033[1;31m"
+BLUE="\033[1;34m"
+PINK="\033[1;35m"
+NC="\033[0m"
+
+echo -e "${RED}╔═══════════════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${RED}║  This VM is for teaching purposes.                                        ║${NC}"
+echo -e "${RED}║  Use is restricted to authorised users and as directed by SCC staff.      ║${NC}"
+echo -e "${RED}╚═══════════════════════════════════════════════════════════════════════════╝${NC}"
+echo ""
+
+if [ ! -f "$IMAGE_PATH" ]; then
+	echo -e "${RED}[sccm_0000]${NC} VM image not found: $IMAGE_PATH"
+	exit 1
+fi
+
+# NET_MODE=user gives NAT networking for testing on a machine without br1.
+if [ "${NET_MODE:-bridge}" = "user" ]; then
+	NETDEV="user,id=net0"
+else
+	NETDEV="bridge,id=net0,br=$BRIDGE"
+fi
+
+echo -e "${BLUE}[sccm_0000]${NC} Launching ${VM_DISPLAY_NAME} VM..."
+echo -e "${BLUE}[sccm_0000]${NC} VM may take a few minutes to start - please keep this window open."
+echo -e "${BLUE}[sccm_0000]${NC} ${PINK}Press Ctrl+C to quit.${NC}"
+echo ""
+
+exec qemu-system-x86_64 \
+	-boot c \
+	-name "$VM_NAME" \
+	-smp "$CPUS" \
+	-m "$MEMORY" \
+	-cpu host,host-phys-bits=on \
+	-machine type=q35,accel=kvm,acpi=on,i8042=off \
+	-device virtio-scsi-pci,id=scsi0 \
+	-device scsi-hd,bus=scsi0.0,drive=drive0 \
+	-drive if=none,file="$IMAGE_PATH",id=drive0,cache=writeback,discard=unmap,format=qcow2 \
+	-vga none -device qxl-vga,max_outputs=1,vgamem_mb=16,vram_size_mb=128,ram_size_mb=128 \
+	-display none \
+	-device virtio-net,netdev=net0,mac="$MAC" \
+	-netdev "$NETDEV" \
+	-device qemu-xhci \
+	-device usb-tablet \
+	-device usb-kbd \
+	-qmp tcp:localhost:"$QMP_PORT",server=on,wait=off \
+	-spice port="$SPICE_PORT",addr=127.0.0.1,disable-ticketing=on,image-compression=off \
+	-device virtio-serial,id=virtio-serial0 \
+	-chardev spicevmc,id=vdagent,debug=0,name=vdagent \
+	-device virtserialport,bus=virtio-serial0.0,chardev=vdagent,name=com.redhat.spice.0

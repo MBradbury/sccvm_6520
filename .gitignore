@@ -1,0 +1,26 @@
+# VM images are NEVER committed - they go on the LUNA share (see README).
+*.qcow2
+*.img
+*.raw
+*.iso
+*.vmdk
+*.vdi
+*.vhd
+*.vhdx
+*.ova
+*.ovf
+
+# Compressed/archived images - upload images uncompressed instead.
+*.xz
+*.gz
+*.zst
+*.zip
+*.7z
+*.tar
+*.bz2
+
+# Local test image folder - only the README is tracked.
+images/*
+!images/README.md
+
+**/.DS_Store
