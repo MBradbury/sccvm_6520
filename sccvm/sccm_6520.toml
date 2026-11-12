@@ -13,7 +13,7 @@
 # ---- Module ----------------------------------------------------------------
 [module]
 description = "SCCM_6520 - Secure Cyber Physical Systems"
-disclaimer = "These VMs should only be used as directed by your instructor."
+disclaimer = "These VMs should only be used as directed by your instructor. You must not launch these VMs unless you have been given explicit permission to do so by Matthew Bradbury (m.s.bradbury@lancaster.ac.uk) or Paul Smith (paul.smith@lancaster.ac.uk)."
 
 # Quick actions shown at the top of the module tab (optional, remove if not needed).
 # mode: "vm"     - start the VMs
@@ -38,7 +38,7 @@ name = "sccm_6520_asherah"
 display_name = "Asherah"
 script = "$HOME/.sccm_6520/bin/sccm_6520_launch_asherah"
 spice_script = "$HOME/.sccm_6520/bin/sccm_6520_spice_asherah"
-description = "The Asherah NPP Simulator"
+description = "The Asherah Nuclear Power Plant Simulator"
 category = "Main Lab"
 module = "SCCM_6520"
 tags = ["sccm_6520", "asherah", "main-lab"]
