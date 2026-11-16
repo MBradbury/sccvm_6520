@@ -157,7 +157,7 @@ def fill_in(path):
     """Return the KEY=value assignments from a script's FILL IN block."""
     out = {}
     for line in path.read_text().splitlines():
-        m = re.match(r'^([A-Z_]+)=("?)([^"#]*?)\2\s*(#.*)?$', line)
+        m = re.match(r'^([A-Z0-9_]+)=("?)([^"#]*?)\2\s*(#.*)?$', line)
         if m:
             out.setdefault(m.group(1), m.group(3).strip())
     return out
@@ -187,9 +187,13 @@ images, macs, ports = {}, {}, {}
 for vm, p in launch.items():
     v = fill_in(p)
     rel = f"bin/{p.name}"
-    for key in ("IMAGE", "CPUS", "MEMORY", "MAC", "QMP_PORT", "SPICE_PORT"):
+    for key in ("IMAGE", "CPUS", "MEMORY", "QMP_PORT", "SPICE_PORT"):
         if not v.get(key):
             err(f"{rel}: FILL IN value {key}= is missing or empty")
+    if not v.get("MAC"):
+        for key in ("MAC1", "MAC2"):
+            if not v.get(key):
+                err(f"{rel}: FILL IN value {key}= is missing or empty")
     lab_line = f'LAB_DIR="${{LAB_DIR:-$HOME/.{CODE}}}"'
     if lab_line not in p.read_text():
         err(f"{rel}: must contain the line {lab_line}")
@@ -209,6 +213,12 @@ for vm, p in launch.items():
         if not re.fullmatch(r"52:54:00(:[0-9a-fA-F]{2}){3}", mac):
             err(f"{rel}: MAC={mac!r} should look like 52:54:00:xx:xx:xx")
         macs.setdefault(mac.lower(), []).append(rel)
+    else:
+        for key in ("MAC1", "MAC2"):
+            mac = v.get(key, "")
+            if not re.fullmatch(r"52:54:00(:[0-9a-fA-F]{2}){3}", mac):
+                err(f"{rel}: {key}={mac!r} should look like 52:54:00:xx:xx:xx")
+            macs.setdefault(mac.lower(), []).append(rel)
 
     for key in ("QMP_PORT", "SPICE_PORT"):
         port = v.get(key, "")
