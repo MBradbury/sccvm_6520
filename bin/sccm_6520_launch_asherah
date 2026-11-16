@@ -19,7 +19,8 @@ MEMORY="8192M"
 MAC="52:54:00:00:00:01"                 # unique per VM
 QMP_PORT=9001                           # unique per VM: 9001, 9002, ...
 SPICE_PORT=8001                         # unique per VM: 8001, 8002, ...
-BRIDGE="br1"                            # lab bridge - leave as br1 unless Systems say otherwise
+BRIDGE="br2"                            # lab bridge - leave as br1 unless Systems say otherwise
+BRIDGE_IP="192.168.20.1/24"
 # ---- Shared Folder Configuration -------------------------------------------
 HOST_VIRTIO_FS_SOCK="/tmp/virtiofs-share-asherah.sock"
 HOST_SHARED_DIRECTORY="$HOME/h-drive/sccm6520"
@@ -67,6 +68,11 @@ if [ "${NET_MODE:-bridge}" = "user" ]; then
 	NETDEV="user,id=net0"
 else
 	NETDEV="bridge,id=net0,br=$BRIDGE"
+
+	BR_IP=$(ip -br addr show dev "$BRIDGE" | awk '{print $3}')
+	if [ "${BR_IP}" != "$BRIDGE_IP" ]; then
+		echo -e "${RED}[sccm_6520]${NC} Bridge ($BRIDGE) network is incorrectly configured."
+	fi
 fi
 
 echo -e "${BLUE}[sccm_6520]${NC} Launching ${VM_DISPLAY_NAME} VM..."
